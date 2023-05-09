@@ -1,9 +1,14 @@
 #include <iostream>
+#include <string>
 #include <map>
 #include <vector>
-#include <string>
 
 using namespace std;
+
+struct Registro
+{
+    map<string, int> entrada;
+};
 
 int main()
 {
@@ -11,8 +16,16 @@ int main()
     FILE *arq;
     string fname;
 
-    vector<map<string, int>> joao;
-    map<string, int> nameToIndex;
+    // entrada a = {"penalti", 10};
+    // entrada b = {"cartao amarelo", 2};
+    // vector<Registro> joao;
+    // joao.push_back(Registro{a, b});
+
+    // cout << joao[0].teste.quesito << endl;
+    // cout << joao[0].teste.qtd << endl;
+    map<string, int> criancaParaIndex;
+    map<string, int> arquivoParaIndex;
+    vector<Registro> criancas; 
 
     while (cmd != 4)
     {
@@ -32,22 +45,27 @@ int main()
                 cout << "erro abrindo o arquivo" << endl;
             else
             {
-                if (nameToIndex.count(fname))
+                if (arquivoParaIndex.count(fname))
                     cout << "arquivo ja carregado" << endl;
                 else
                 {
-                    nameToIndex.insert(pair<string, int>("ola", nameToIndex.size()));
-                    joao.push_back(nameToIndex);
-                    vector<map<string, int>>::iterator it;
-                    it = joao.begin();
-                    auto it1 = it->begin();
-                    cout << it1->first << " " << it1->second << endl;
+                    
                 }
-                // map<string, int> reg;
-                // reg = ("Ola", 2);
-                // carregar as informações do csv no modelo
-            }
 
+                // nameToIndex["ola"] = 0;
+                // nameToIndex["oi"] = 1;
+                // nameToIndex["dois"] = 2;
+
+                // auto it = segunda.begin() + 2;
+                // segunda.insert(it, {"penalti", 2});
+
+                // joao[nameToIndex["ola"]] = {"canto", 10};
+                // joao[nameToIndex["oi"]] = {"cartao amarelo", 57};
+
+                // cout << segunda[nameToIndex["ola"]].quesito << " " << segunda[nameToIndex["ola"]].qtd << endl;
+                // cout << segunda[nameToIndex["oi"]].quesito << " " << segunda[nameToIndex["oi"]].qtd << endl;
+                // cout << segunda[nameToIndex["dois"]].quesito << " " << segunda[nameToIndex["dois"]].qtd << endl;
+            }
             fclose(arq);
             break;
         case 2:
