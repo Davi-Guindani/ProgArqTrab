@@ -49,6 +49,7 @@ int main()
                     cout << "arquivo ja carregado" << endl;
                 else
                 {
+                    arquivoParaIndex[fname] = arquivoParaIndex.size();
                     
                 }
 
