@@ -26,7 +26,7 @@ int main()
 
     vector<map<string, string>> crianca;
     vector<map<string, string>>::iterator it2;
-    
+
     map<string, string> reg;
     map<string, string>::iterator it3;
 
@@ -35,6 +35,7 @@ int main()
         string nome;
         string fundamento;
         string qtd;
+        string teste;
 
         cout << "Digite 1 para ler um arquivo CSV" << endl
              << "Digite 2 para acessar o relatorio de uma crianca" << endl
@@ -56,34 +57,71 @@ int main()
                 fname.erase(fname.end() - 4, fname.end());
 
                 if (!arqParaIndex.count(fname))
-                {
                     arqParaIndex[fname] = arqParaIndex.size();
-                }
 
-                getline(arq, nome, ',');
-                getline(arq, fundamento, ',');
-                getline(arq, qtd, ',');
-
-                if (!criancaParaIndex.count(nome))
+                while (arq.good())
                 {
-                    criancaParaIndex[nome] = criancaParaIndex.size();
-                }
+                    getline(arq, nome, ',');
+                    if (!criancaParaIndex.count(nome))
+                        criancaParaIndex[nome] = criancaParaIndex.size();
 
-                reg[fundamento] = qtd;
-
-                crianca.insert(crianca.begin() + arqParaIndex[fname] - 1, reg);
-                criancas.insert(criancas.begin() + criancaParaIndex[nome] - 1, crianca);
-
-                for (it1 = criancas.begin(); it1 != criancas.end(); it1++)
-                {
-                    for (it2 = it1->begin(); it2 != it1->end(); it2++)
+                    criancas.insert(criancas.begin() + criancaParaIndex[nome], crianca);
+                    
+                    getline(arq, fundamento, ',');
+                    getline(arq, qtd, ',');
+                    getline(arq, teste, ',');
+                    reg[fundamento] = qtd;
+                    while (teste != "")
                     {
-                        for (it3 = it2->begin(); it3 != it2->end(); it3++)
+                        fundamento = teste;
+                        getline(arq, qtd, ',');
+                        getline(arq, teste, ',');
+                        reg[fundamento] = qtd;
+                    }
+
+                    crianca.clear();
+                    criancas.insert(crianca.begin() + criancaParaIndex[nome] - 1, crianca);
+                    criancas.at(criancaParaIndex[nome] - 1).insert(crianca.begin() + arqParaIndex[nome] - 1, reg);
+
+                    for (it1 = criancas.begin(); it1 != criancas.end(); ++it1)
+                    {
+                        for (it2 = it1->begin(); it2 != it1->end(); ++it2)
                         {
-                            cout << it3->first << " " << it3->second << endl;
+                            for (it3 = it2->begin(); it3 != it2->end(); ++it3)
+                            {
+                                cout << it3->first << " " << it3->second << endl;
+                            }
                         }
                     }
+
+                    reg.clear();
+                    crianca.clear();
                 }
+
+                // getline(arq, nome, ',');
+                // getline(arq, fundamento, ',');
+                // getline(arq, qtd, ',');
+
+                // if (!criancaParaIndex.count(nome))
+                // {
+                //     criancaParaIndex[nome] = criancaParaIndex.size();
+                // }
+
+                // reg[fundamento] = qtd;
+
+                // crianca.insert(crianca.begin() + arqParaIndex[fname] - 1, reg);
+                // criancas.insert(criancas.begin() + criancaParaIndex[nome] - 1, crianca);
+
+                // for (it1 = criancas.begin(); it1 != criancas.end(); it1++)
+                // {
+                //     for (it2 = it1->begin(); it2 != it1->end(); it2++)
+                //     {
+                //         for (it3 = it2->begin(); it3 != it2->end(); it3++)
+                //         {
+                //             cout << it3->first << " " << it3->second << endl;
+                //         }
+                //     }
+                // }
             }
             arq.close();
             break;
