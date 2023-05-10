@@ -2,33 +2,40 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <fstream>
 
 using namespace std;
 
 struct Registro
 {
-    map<string, int> entrada;
+    string fundamento;
+    string qtd;
 };
 
 int main()
 {
     int cmd = 0;
-    FILE *arq;
+    ifstream arq;
     string fname;
 
-    // entrada a = {"penalti", 10};
-    // entrada b = {"cartao amarelo", 2};
-    // vector<Registro> joao;
-    // joao.push_back(Registro{a, b});
-
-    // cout << joao[0].teste.quesito << endl;
-    // cout << joao[0].teste.qtd << endl;
     map<string, int> criancaParaIndex;
-    map<string, int> arquivoParaIndex;
-    vector<Registro> criancas; 
+    map<string, int> arqParaIndex;
+
+    vector<vector<map<string, string>>> criancas;
+    vector<vector<map<string, string>>>::iterator it1;
+
+    vector<map<string, string>> crianca;
+    vector<map<string, string>>::iterator it2;
+    
+    map<string, string> reg;
+    map<string, string>::iterator it3;
 
     while (cmd != 4)
     {
+        string nome;
+        string fundamento;
+        string qtd;
+
         cout << "Digite 1 para ler um arquivo CSV" << endl
              << "Digite 2 para acessar o relatorio de uma crianca" << endl
              << "Digite 3 para acessar o relatorio de um quesito" << endl
@@ -39,35 +46,46 @@ int main()
         case 1:
             cout << "Digite o nome do arquivo csv sem a extensao: ";
             cin >> fname;
+            fname += ".csv";
 
-            arq = fopen((fname + ".csv").c_str(), "r");
-            if (arq == NULL)
+            arq.open(fname.c_str());
+            if (!arq.is_open())
                 cout << "erro abrindo o arquivo" << endl;
             else
             {
-                if (arquivoParaIndex.count(fname))
-                    cout << "arquivo ja carregado" << endl;
-                else
+                fname.erase(fname.end() - 4, fname.end());
+
+                if (!arqParaIndex.count(fname))
                 {
-                    arquivoParaIndex[fname] = arquivoParaIndex.size();
-                    
+                    arqParaIndex[fname] = arqParaIndex.size();
                 }
 
-                // nameToIndex["ola"] = 0;
-                // nameToIndex["oi"] = 1;
-                // nameToIndex["dois"] = 2;
+                getline(arq, nome, ',');
+                getline(arq, fundamento, ',');
+                getline(arq, qtd, ',');
 
-                // auto it = segunda.begin() + 2;
-                // segunda.insert(it, {"penalti", 2});
+                if (!criancaParaIndex.count(nome))
+                {
+                    criancaParaIndex[nome] = criancaParaIndex.size();
+                }
 
-                // joao[nameToIndex["ola"]] = {"canto", 10};
-                // joao[nameToIndex["oi"]] = {"cartao amarelo", 57};
+                reg[fundamento] = qtd;
 
-                // cout << segunda[nameToIndex["ola"]].quesito << " " << segunda[nameToIndex["ola"]].qtd << endl;
-                // cout << segunda[nameToIndex["oi"]].quesito << " " << segunda[nameToIndex["oi"]].qtd << endl;
-                // cout << segunda[nameToIndex["dois"]].quesito << " " << segunda[nameToIndex["dois"]].qtd << endl;
+                crianca.insert(crianca.begin() + arqParaIndex[fname] - 1, reg);
+                criancas.insert(criancas.begin() + criancaParaIndex[nome] - 1, crianca);
+
+                for (it1 = criancas.begin(); it1 != criancas.end(); it1++)
+                {
+                    for (it2 = it1->begin(); it2 != it1->end(); it2++)
+                    {
+                        for (it3 = it2->begin(); it3 != it2->end(); it3++)
+                        {
+                            cout << it3->first << " " << it3->second << endl;
+                        }
+                    }
+                }
             }
-            fclose(arq);
+            arq.close();
             break;
         case 2:
             // relatar criança
