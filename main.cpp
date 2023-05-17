@@ -29,17 +29,19 @@ void lerArquivoCSV(const string& nomeArquivo, unordered_map<string, vector<Regis
 
         if (!nome.empty()) { //verifica se o nome nao esta vazio, evita de armazenar linhas vazias ou invalidas
             Registro registro;
-            registro.entradas.reserve(6); // N�mero m�ximo de entradas 
+            registro.entradas.reserve(3); // Numero maximo de entradas *****
 
             while (getline(iss, entrada, ',')) { //como feito em nome,  agora armazeno as entradas
                 if (!entrada.empty()) //verifica se nao esta vazio
                     registro.entradas.push_back(entrada); //armazena no vetor
             }
 
-            string data = nomeArquivo.substr(0, nomeArquivo.find_first_of('.')); //armazena o nome do arquivo ate o ponto, eliminando a extensao
+            string data (nomeArquivo.substr(0, nomeArquivo.find_first_of('.'))); //armazena o nome do arquivo ate o ponto, eliminando a extensao
+            data.insert(2,"/");
+            data.insert(5,"/");
             registro.data = data; // extrai a data do nome do arquivo e atribui ao registro
 
-            registros[nome].push_back(registro); //adiciona 'registro' ao mapa 'registros', usa o nome como chave agrupando todos os registros de uma mesma crian�a
+            registros[nome].push_back(registro); //adiciona 'registro' ao mapa 'registros', usa o nome como chave agrupando todos os registros de uma mesma crianca
         }
     }
 
@@ -68,25 +70,25 @@ void lerArquivoCSV(const string& nomeArquivo, unordered_map<string, vector<Regis
 
 
 void gerarRelatorioPorCrianca(const string& nomeCrianca, const unordered_map<string, vector<Registro>>& registros) {
-    auto it = registros.find(nomeCrianca); //usa o iterador para procurar em "registros" usando o nome da crian�a como chave
+    auto it = registros.find(nomeCrianca); //usa o iterador para procurar em "registros" usando o nome da crianca como chave
 
-    if (it != registros.end()) { //se encontrar o nome da crian�a
-        const vector<Registro>& registrosCrianca = it->second; // aponta pros registros da crian�a em questao
-
+    if (it != registros.end()) { //se encontrar o nome da criança
+        const vector<Registro>& registrosCrianca = it->second; // aponta pros registros da criança em questao
+        cout << "Relatorio de " << nomeCrianca << ":\n";
         for (const Registro& registro : registrosCrianca) {
-            cout << "Data: " << registro.data << endl; // imprime a data que � o nome do arquivo
+            cout << "Data: " << registro.data << endl; // imprime a data que e o nome do arquivo
 
             for (size_t i = 0; i < registro.entradas.size(); i += 2) { //percorre o vetor de 2 em 2 ja que sao pares de valores quesito e quantidade
                 string quesito = registro.entradas[i]; 
                 int quantidade = stoi(registro.entradas[i + 1]); // transforma o valor das entradas em inteiro "string to integer"
 
-               cout << quesito << ": " << quantidade << endl; // imprime cada quesito da crian�a em questao
+               cout << quesito << ": " << quantidade << endl; // imprime cada quesito da criança em questao
             }
 
             cout << endl;
         }
     } else {
-        cout << "Crianca n�o encontrada." << endl; //caso nao entre no IF imprime isso ai
+        cout << "Crianca nao encontrada." << endl; //caso nao entre no IF imprime isso ai
     }
 }
 
@@ -102,10 +104,8 @@ void gerarRelatorioPorQuesito(const string& quesito, const unordered_map<string,
 			for (const string& data : ocorrencia.datas)
 				for (const string& data : ocorrencia.datas)
    					cout << "Data: " << data << ", Quantidade: " << ocorrencia.quantidade << endl;
-
-			
-			cout << endl;
-		    }
+		cout << endl;
+		}
 } else 
     cout << "Quesito nao encontrado." << endl;
 
@@ -128,7 +128,7 @@ int main() {
 	
 	    switch (opcao) {
 	        case 1: {
-	            vector <string> nomeArquivo{"01122022","13022022","18052022","27082022","31102022"};
+	            vector <string> nomeArquivo{"01122022","13022022","18052022","27082022","31102022","17052023"};
 	            //cout << "Digite o nome do arquivo (sem a extensao): ";
 	            //cin >> nomeArquivo;
 	        	for(string i : nomeArquivo){
@@ -141,7 +141,7 @@ int main() {
 	            string nomeCrianca;
 	            cout << "Digite o nome da crianca: ";
 	            cin.ignore(); // Limpar o buffer do teclado
-	            cin >> nomeCrianca;
+	            getline(cin,nomeCrianca);
 	            cout << endl;
 	            gerarRelatorioPorCrianca(nomeCrianca, registros);
 	            break;
@@ -159,10 +159,9 @@ int main() {
 	            cout << "Encerrando o programa..." << endl;
 	            break;
 	        default:
-	            cout << "Op��o inv�lida." << endl;
+	            cout << "Opcao invalida." << endl;
 	            break;
 	    }
-	
 	    cout << endl;
 	} while (opcao != 4);
 	
