@@ -29,7 +29,7 @@ void lerArquivoCSV(const string& nomeArquivo, unordered_map<string, vector<Regis
 
         if (!nome.empty()) { //verifica se o nome nao esta vazio, evita de armazenar linhas vazias ou invalidas
             Registro registro;
-            registro.entradas.reserve(6); // Número máximo de entradas 
+            registro.entradas.reserve(6); // Nï¿½mero mï¿½ximo de entradas 
 
             while (getline(iss, entrada, ',')) { //como feito em nome,  agora armazeno as entradas
                 if (!entrada.empty()) //verifica se nao esta vazio
@@ -39,13 +39,13 @@ void lerArquivoCSV(const string& nomeArquivo, unordered_map<string, vector<Regis
             string data = nomeArquivo.substr(0, nomeArquivo.find_first_of('.')); //armazena o nome do arquivo ate o ponto, eliminando a extensao
             registro.data = data; // extrai a data do nome do arquivo e atribui ao registro
 
-            registros[nome].push_back(registro); //adiciona 'registro' ao mapa 'registros', usa o nome como chave agrupando todos os registros de uma mesma criança
+            registros[nome].push_back(registro); //adiciona 'registro' ao mapa 'registros', usa o nome como chave agrupando todos os registros de uma mesma crianï¿½a
         }
     }
 
     arquivo.close(); // fecha o arquivo
 
-    for (auto& it : registros) { // percorre o mapa, cada iteracao obtem um par chave-valor, chave é o nome da crianca e valor o vetor de registros associados a ela
+    for (auto& it : registros) { // percorre o mapa, cada iteracao obtem um par chave-valor, chave ï¿½ o nome da crianca e valor o vetor de registros associados a ela
         const string& crianca = it.first; //armazena o nome da crianca
         vector<Registro>& registrosCrianca = it.second; //referencia para o vetor de registros
 
@@ -68,25 +68,25 @@ void lerArquivoCSV(const string& nomeArquivo, unordered_map<string, vector<Regis
 
 
 void gerarRelatorioPorCrianca(const string& nomeCrianca, const unordered_map<string, vector<Registro>>& registros) {
-    auto it = registros.find(nomeCrianca); //usa o iterador para procurar em "registros" usando o nome da criança como chave
+    auto it = registros.find(nomeCrianca); //usa o iterador para procurar em "registros" usando o nome da crianï¿½a como chave
 
-    if (it != registros.end()) { //se encontrar o nome da criança
-        const vector<Registro>& registrosCrianca = it->second; // aponta pros registros da criança em questao
+    if (it != registros.end()) { //se encontrar o nome da crianï¿½a
+        const vector<Registro>& registrosCrianca = it->second; // aponta pros registros da crianï¿½a em questao
 
         for (const Registro& registro : registrosCrianca) {
-            cout << "Data: " << registro.data << endl; // imprime a data que é o nome do arquivo
+            cout << "Data: " << registro.data << endl; // imprime a data que ï¿½ o nome do arquivo
 
             for (size_t i = 0; i < registro.entradas.size(); i += 2) { //percorre o vetor de 2 em 2 ja que sao pares de valores quesito e quantidade
                 string quesito = registro.entradas[i]; 
                 int quantidade = stoi(registro.entradas[i + 1]); // transforma o valor das entradas em inteiro "string to integer"
 
-               cout << quesito << ": " << quantidade << endl; // imprime cada quesito da criança em questao
+               cout << quesito << ": " << quantidade << endl; // imprime cada quesito da crianï¿½a em questao
             }
 
             cout << endl;
         }
     } else {
-        cout << "Crianca não encontrada." << endl; //caso nao entre no IF imprime isso ai
+        cout << "Crianca nï¿½o encontrada." << endl; //caso nao entre no IF imprime isso ai
     }
 }
 
@@ -120,7 +120,7 @@ int main() {
 	do {
 	    cout << "Menu:\n"
 	              << "1 - Ler novo arquivo CSV\n"
-	              << "2 - Gerar relatorio por criança\n"
+	              << "2 - Gerar relatorio por crianca\n"
 	              << "3 - Gerar relatorio por quesito\n"
 	              << "4 - Encerrar o programa\n"
 	              << "Digite a opcao: ";
@@ -128,11 +128,12 @@ int main() {
 	
 	    switch (opcao) {
 	        case 1: {
-	            string nomeArquivo;
-	            cout << "Digite o nome do arquivo (sem a extensao): ";
-	            cin >> nomeArquivo;
-	        	
-	            lerArquivoCSV(nomeArquivo, registros, ocorrencias);
+	            vector <string> nomeArquivo{"01122022","13022022","18052022","27082022","31102022"};
+	            //cout << "Digite o nome do arquivo (sem a extensao): ";
+	            //cin >> nomeArquivo;
+	        	for(string i : nomeArquivo){
+                    lerArquivoCSV(i, registros, ocorrencias);
+                }
 	            cout << "Arquivo lido e processado com sucesso." << endl;
 	            break;
 	        }
@@ -158,7 +159,7 @@ int main() {
 	            cout << "Encerrando o programa..." << endl;
 	            break;
 	        default:
-	            cout << "Opção inválida." << endl;
+	            cout << "Opï¿½ï¿½o invï¿½lida." << endl;
 	            break;
 	    }
 	
