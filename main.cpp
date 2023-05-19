@@ -29,7 +29,7 @@ void lerArquivoCSV(const string& nomeArquivo, unordered_map<string, vector<Regis
 
         if (!nome.empty()) { //verifica se o nome nao esta vazio, evita de armazenar linhas vazias ou invalidas
             Registro registro;
-            registro.entradas.reserve(3); // Numero maximo de entradas *****
+            registro.entradas.reserve(6); // Numero maximo de entradas
 
             while (getline(iss, entrada, ',')) { //como feito em nome,  agora armazeno as entradas
                 if (!entrada.empty()) //verifica se nao esta vazio
@@ -84,8 +84,6 @@ void gerarRelatorioPorCrianca(const string& nomeCrianca, const unordered_map<str
 
                cout << quesito << ": " << quantidade << endl; // imprime cada quesito da criança em questao
             }
-
-            cout << endl;
         }
     } else {
         cout << "Crianca nao encontrada." << endl; //caso nao entre no IF imprime isso ai
@@ -104,7 +102,6 @@ void gerarRelatorioPorQuesito(const string& quesito, const unordered_map<string,
 			for (const string& data : ocorrencia.datas)
 				for (const string& data : ocorrencia.datas)
    					cout << "Data: " << data << ", Quantidade: " << ocorrencia.quantidade << endl;
-		cout << endl;
 		}
 } else 
     cout << "Quesito nao encontrado." << endl;
@@ -115,55 +112,50 @@ int main() {
 	//Declaracao dos mapas
 	unordered_map<string, vector<Registro>> registros; 
 	unordered_map<string, vector<Ocorrencia>> ocorrencias;
-	
 	int opcao;
 	do {
-	    cout << "Menu:\n"
-	              << "1 - Ler novo arquivo CSV\n"
-	              << "2 - Gerar relatorio por crianca\n"
-	              << "3 - Gerar relatorio por quesito\n"
-	              << "4 - Encerrar o programa\n"
-	              << "Digite a opcao: ";
-	    cin >> opcao;
-	
-	    switch (opcao) {
-	        case 1: {
-	            vector <string> nomeArquivo{"01122022","13022022","18052022","27082022","31102022","17052023"};
-	            //cout << "Digite o nome do arquivo (sem a extensao): ";
-	            //cin >> nomeArquivo;
-	        	for(string i : nomeArquivo){
-                    lerArquivoCSV(i, registros, ocorrencias);
+            cout << "Menu:\n"
+                    << "1 - Ler novo arquivo CSV\n"
+                    << "2 - Gerar relatorio por crianca\n"
+                    << "3 - Gerar relatorio por quesito\n"
+                    << "4 - Encerrar o programa\n"
+                    << "Digite a opcao: ";
+            cin >> opcao;
+            switch (opcao) {
+                case 1: {
+                    string nomeArquivo;
+                    cout << "Digite o nome do arquivo (sem a extensao): ";
+                    cin >> nomeArquivo;
+                    lerArquivoCSV(nomeArquivo, registros, ocorrencias);
+                    cout << "Arquivo lido e processado com sucesso." << endl;
+                    break;
                 }
-	            cout << "Arquivo lido e processado com sucesso." << endl;
-	            break;
-	        }
-	        case 2: {
-	            string nomeCrianca;
-	            cout << "Digite o nome da crianca: ";
-	            cin.ignore(); // Limpar o buffer do teclado
-	            getline(cin,nomeCrianca);
-	            cout << endl;
-	            gerarRelatorioPorCrianca(nomeCrianca, registros);
-	            break;
-	        }
-	        case 3: {
-	            string quesito;
-	            cout << "Digite o quesito: ";
-	            cin.ignore(); // Limpar o buffer do teclado
-	            cin >> quesito;
-	            cout << endl;
-	            gerarRelatorioPorQuesito(quesito, ocorrencias);
-	            break;
-	        }
-	        case 4:
-	            cout << "Encerrando o programa..." << endl;
-	            break;
-	        default:
-	            cout << "Opcao invalida." << endl;
-	            break;
-	    }
-	    cout << endl;
-	} while (opcao != 4);
-	
+                case 2: {
+                    string nomeCrianca;
+                    cout << "Digite o nome da crianca: ";
+                    cin.ignore(); // Limpar o buffer do teclado
+                    getline(cin,nomeCrianca);
+                    cout << endl;
+                    gerarRelatorioPorCrianca(nomeCrianca, registros);
+                    break;
+                }
+                case 3: {
+                    string quesito;
+                    cout << "Digite o quesito: ";
+                    cin.ignore(); // Limpar o buffer do teclado
+                    cin >> quesito;
+                    cout << endl;
+                    gerarRelatorioPorQuesito(quesito, ocorrencias);
+                    break;
+                }
+                case 4:
+                    cout << "Encerrando o programa..." << endl;
+                    break;
+                default:
+                    cout << "Opcao invalida." << endl;
+                    break;
+            }
+            cout << endl;
+        }while (opcao != 4);
 	return 0;
 }
