@@ -74,7 +74,9 @@ void gerarRelatorioPorCrianca(const string& nomeCrianca, const unordered_map<str
         const vector<Registro>& registrosCrianca = it->second; // aponta pros registros da criança em questao
 
         for (const Registro& registro : registrosCrianca) {
-            cout << "Data: " << registro.data << endl; // imprime a data que é o nome do arquivo
+             if (!registro.data.empty()) {
+		        cout << "Data: " << registro.data << endl;
+		    }
 
             for (size_t i = 0; i < registro.entradas.size(); i += 2) { //percorre o vetor de 2 em 2 ja que sao pares de valores quesito e quantidade
                 string quesito = registro.entradas[i]; 
@@ -101,8 +103,11 @@ void gerarRelatorioPorQuesito(const string& quesito, const unordered_map<string,
 			
 			for (const string& data : ocorrencia.datas)
 				for (const string& data : ocorrencia.datas)
-   					cout << "Data: " << data << ", Quantidade: " << ocorrencia.quantidade << endl;
-
+   					 if (!data.empty()) {
+				        cout << "Data: " << data ;
+				    }
+				cout << "Quantidade: " << ocorrencia.quantidade << endl;    
+				    
 			
 			cout << endl;
 		    }
@@ -110,6 +115,59 @@ void gerarRelatorioPorQuesito(const string& quesito, const unordered_map<string,
     cout << "Quesito nao encontrado." << endl;
 
 }
+
+void atualizarDados(unordered_map<string, vector<Registro>>& registros, unordered_map<string, vector<Ocorrencia>>& ocorrencias) {
+    // Limpar os dados existentes
+    registros.clear(); // Limpa o mapa de registros
+    ocorrencias.clear(); // Limpa o mapa de ocorrencias
+
+    ifstream arquivo("indice.dat"); // Abre o arquivo "indice.dat" para leitura
+    string linha; // Variável para armazenar cada linha do arquivo
+
+    while (getline(arquivo, linha)) { // Lê cada linha do arquivo
+        istringstream iss(linha); // Cria um fluxo de string para processar cada linha
+        string nome;
+        getline(iss, nome, ','); // Extrai o nome da criança separado por vírgula
+        string entrada;
+
+        if (!nome.empty()) { // Verifica se o nome não está vazio
+            Registro registro; // Cria um objeto Registro para armazenar os dados
+            registro.entradas.reserve(6); // Reserva espaço para 6 entradas
+
+            while (getline(iss, entrada, ',')) { // Lê as próximas entradas separadas por vírgula
+                if (!entrada.empty()) // Verifica se a entrada não está vazia
+                    registro.entradas.push_back(entrada); // Armazena a entrada no vetor de entradas do registro
+            }
+
+            registros[nome].push_back(registro); // Adiciona o registro ao mapa de registros usando o nome como chave
+        }
+    }
+
+    arquivo.close(); // Fecha o arquivo
+
+    for (auto& it : registros) { // Percorre o mapa de registros
+        const string& crianca = it.first; // Armazena o nome da criança
+        vector<Registro>& registrosCrianca = it.second; // Referência para o vetor de registros da criança
+
+        for (const Registro& registro : registrosCrianca) { // Percorre cada registro da criança
+            for (size_t i = 0; i < registro.entradas.size(); i += 2) { // Percorre o vetor de entradas de 2 em 2
+                string quesito = registro.entradas[i]; // Armazena o quesito
+                int quantidade = stoi(registro.entradas[i + 1]); // Converte a quantidade para inteiro
+
+                Ocorrencia ocorrencia; // Cria um objeto Ocorrencia para agrupar os dados
+                ocorrencia.crianca = crianca; // Armazena o nome da criança na ocorrencia
+                ocorrencia.datas.push_back(registro.data); // Adiciona a data do registro à ocorrencia
+                ocorrencia.quantidade = quantidade; // Armazena a quantidade na ocorrencia
+
+                ocorrencias[quesito].push_back(ocorrencia); // Adiciona a ocorrencia ao mapa de ocorrencias usando o quesito como chave
+            }
+        }
+    }
+
+    cout << "Dados atualizados com sucesso." << endl; // Exibe mensagem de sucesso
+}
+
+
 
 int main() {
 	//Declaracao dos mapas
@@ -122,7 +180,10 @@ int main() {
 	              << "1 - Ler novo arquivo CSV\n"
 	              << "2 - Gerar relatorio por criança\n"
 	              << "3 - Gerar relatorio por quesito\n"
-	              << "4 - Encerrar o programa\n"
+	              << "4 - \n"
+	              << "5 - \n"
+	              << "6 - Atualizar dados\n"
+	              << "7 - Encerrar o programa\n"
 	              << "Digite a opcao: ";
 	    cin >> opcao;
 	
@@ -154,7 +215,17 @@ int main() {
 	            gerarRelatorioPorQuesito(quesito, ocorrencias);
 	            break;
 	        }
-	        case 4:
+	        case 4: {
+			    break;
+	        }
+	        case 5: {
+	            break;
+	        }
+	        case 6: {
+	        	atualizarDados(registros, ocorrencias);
+	            break;
+	        }
+	        case 7:
 	            cout << "Encerrando o programa..." << endl;
 	            break;
 	        default:
@@ -163,7 +234,7 @@ int main() {
 	    }
 	
 	    cout << endl;
-	} while (opcao != 4);
+	} while (opcao != 7);
 	
 	return 0;
 }
