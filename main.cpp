@@ -29,7 +29,7 @@ void lerArquivoCSV(const string& nomeArquivo, unordered_map<string, vector<Regis
 
         if (!nome.empty()) { //verifica se o nome nao esta vazio, evita de armazenar linhas vazias ou invalidas
             Registro registro;
-            registro.entradas.reserve(6); // Número máximo de entradas 
+            registro.entradas.reserve(6); // N?mero m?ximo de entradas 
 
             while (getline(iss, entrada, ',')) { //como feito em nome,  agora armazeno as entradas
                 if (!entrada.empty()) //verifica se nao esta vazio
@@ -39,13 +39,13 @@ void lerArquivoCSV(const string& nomeArquivo, unordered_map<string, vector<Regis
             string data = nomeArquivo.substr(0, nomeArquivo.find_first_of('.')); //armazena o nome do arquivo ate o ponto, eliminando a extensao
             registro.data = data; // extrai a data do nome do arquivo e atribui ao registro
 
-            registros[nome].push_back(registro); //adiciona 'registro' ao mapa 'registros', usa o nome como chave agrupando todos os registros de uma mesma criança
+            registros[nome].push_back(registro); //adiciona 'registro' ao mapa 'registros', usa o nome como chave agrupando todos os registros de uma mesma crian?a
         }
     }
 
     arquivo.close(); // fecha o arquivo
 
-    for (auto& it : registros) { // percorre o mapa, cada iteracao obtem um par chave-valor, chave é o nome da crianca e valor o vetor de registros associados a ela
+    for (auto& it : registros) { // percorre o mapa, cada iteracao obtem um par chave-valor, chave ? o nome da crianca e valor o vetor de registros associados a ela
         const string& crianca = it.first; //armazena o nome da crianca
         vector<Registro>& registrosCrianca = it.second; //referencia para o vetor de registros
 
@@ -68,10 +68,10 @@ void lerArquivoCSV(const string& nomeArquivo, unordered_map<string, vector<Regis
 
 
 void gerarRelatorioPorCrianca(const string& nomeCrianca, const unordered_map<string, vector<Registro>>& registros) {
-    auto it = registros.find(nomeCrianca); //usa o iterador para procurar em "registros" usando o nome da criança como chave
+    auto it = registros.find(nomeCrianca); //usa o iterador para procurar em "registros" usando o nome da crian?a como chave
 
-    if (it != registros.end()) { //se encontrar o nome da criança
-        const vector<Registro>& registrosCrianca = it->second; // aponta pros registros da criança em questao
+    if (it != registros.end()) { //se encontrar o nome da crian?a
+        const vector<Registro>& registrosCrianca = it->second; // aponta pros registros da crian?a em questao
 
         for (const Registro& registro : registrosCrianca) {
              if (!registro.data.empty()) {
@@ -82,13 +82,13 @@ void gerarRelatorioPorCrianca(const string& nomeCrianca, const unordered_map<str
                 string quesito = registro.entradas[i]; 
                 int quantidade = stoi(registro.entradas[i + 1]); // transforma o valor das entradas em inteiro "string to integer"
 
-               cout << quesito << ": " << quantidade << endl; // imprime cada quesito da criança em questao
+               cout << quesito << ": " << quantidade << endl; // imprime cada quesito da crian?a em questao
             }
 
             cout << endl;
         }
     } else {
-        cout << "Crianca não encontrada." << endl; //caso nao entre no IF imprime isso ai
+        cout << "Crianca n?o encontrada." << endl; //caso nao entre no IF imprime isso ai
     }
 }
 
@@ -106,7 +106,7 @@ void gerarRelatorioPorQuesito(const string& quesito, const unordered_map<string,
    					 if (!data.empty()) {
 				        cout << "Data: " << data ;
 				    }
-				cout << "Quantidade: " << ocorrencia.quantidade << endl;    
+				cout << "\nQuantidade: " << ocorrencia.quantidade << endl;    
 				    
 			
 			cout << endl;
@@ -116,57 +116,94 @@ void gerarRelatorioPorQuesito(const string& quesito, const unordered_map<string,
 
 }
 
-void atualizarDados(unordered_map<string, vector<Registro>>& registros, unordered_map<string, vector<Ocorrencia>>& ocorrencias) {
-    // Limpar os dados existentes
-    registros.clear(); // Limpa o mapa de registros
-    ocorrencias.clear(); // Limpa o mapa de ocorrencias
+void salvarDados(const unordered_map<string, vector<Registro>>& registros, const unordered_map<string, vector<Ocorrencia>>& ocorrencias) {
+    ofstream arquivo("indice.dat"); // Abrir o arquivo em modo texto
 
-    ifstream arquivo("indice.dat"); // Abre o arquivo "indice.dat" para leitura
-    string linha; // Variável para armazenar cada linha do arquivo
+    if (arquivo.is_open()) {
+        // Salvar registros
+        for (const auto& it : registros) {
+            const string& crianca = it.first;
+            const vector<Registro>& registrosCrianca = it.second;
 
-    while (getline(arquivo, linha)) { // Lê cada linha do arquivo
-        istringstream iss(linha); // Cria um fluxo de string para processar cada linha
-        string nome;
-        getline(iss, nome, ','); // Extrai o nome da criança separado por vírgula
-        string entrada;
+            arquivo << crianca;
 
-        if (!nome.empty()) { // Verifica se o nome não está vazio
-            Registro registro; // Cria um objeto Registro para armazenar os dados
-            registro.entradas.reserve(6); // Reserva espaço para 6 entradas
-
-            while (getline(iss, entrada, ',')) { // Lê as próximas entradas separadas por vírgula
-                if (!entrada.empty()) // Verifica se a entrada não está vazia
-                    registro.entradas.push_back(entrada); // Armazena a entrada no vetor de entradas do registro
+            for (const Registro& registro : registrosCrianca) {
+                for (const string& entrada : registro.entradas) {
+                    arquivo << "," << entrada;
+                }
             }
 
-            registros[nome].push_back(registro); // Adiciona o registro ao mapa de registros usando o nome como chave
+            arquivo << endl;
         }
-    }
 
-    arquivo.close(); // Fecha o arquivo
+        arquivo << endl;
 
-    for (auto& it : registros) { // Percorre o mapa de registros
-        const string& crianca = it.first; // Armazena o nome da criança
-        vector<Registro>& registrosCrianca = it.second; // Referência para o vetor de registros da criança
+        // Salvar ocorrencias
+        for (const auto& it : ocorrencias) {
+            const string& quesito = it.first;
+            const vector<Ocorrencia>& ocorrenciasQuesito = it.second;
 
-        for (const Registro& registro : registrosCrianca) { // Percorre cada registro da criança
-            for (size_t i = 0; i < registro.entradas.size(); i += 2) { // Percorre o vetor de entradas de 2 em 2
-                string quesito = registro.entradas[i]; // Armazena o quesito
-                int quantidade = stoi(registro.entradas[i + 1]); // Converte a quantidade para inteiro
+            arquivo << quesito;
 
-                Ocorrencia ocorrencia; // Cria um objeto Ocorrencia para agrupar os dados
-                ocorrencia.crianca = crianca; // Armazena o nome da criança na ocorrencia
-                ocorrencia.datas.push_back(registro.data); // Adiciona a data do registro à ocorrencia
-                ocorrencia.quantidade = quantidade; // Armazena a quantidade na ocorrencia
-
-                ocorrencias[quesito].push_back(ocorrencia); // Adiciona a ocorrencia ao mapa de ocorrencias usando o quesito como chave
+            for (const Ocorrencia& ocorrencia : ocorrenciasQuesito) {
+                arquivo << "," << ocorrencia.crianca << "," << ocorrencia.quantidade;
             }
-        }
-    }
 
-    cout << "Dados atualizados com sucesso." << endl; // Exibe mensagem de sucesso
+            arquivo << endl;
+        }
+
+        arquivo.close();
+    } else {
+        cout << "Erro ao abrir o arquivo indice.dat" << endl;
+    }
 }
 
+void carregarDados(unordered_map<string, vector<Registro>>& registros, unordered_map<string, vector<Ocorrencia>>& ocorrencias) {
+    ifstream arquivo("indice.dat"); // Abrir o arquivo em modo texto
+
+    registros.clear(); // Limpar registros existentes
+    ocorrencias.clear(); // Limpar ocorrencias existentes
+
+    if (arquivo.is_open()) {
+        string linha;
+
+        // Carregar registros
+        while (getline(arquivo, linha) && !linha.empty()) {
+            istringstream iss(linha);
+            string crianca;
+            getline(iss, crianca, ',');
+
+            Registro registro;
+            string entrada;
+            while (getline(iss, entrada, ',')) {
+                registro.entradas.push_back(entrada);
+            }
+
+            registros[crianca].push_back(registro);
+        }
+
+        // Carregar ocorrencias
+        while (getline(arquivo, linha)) {
+            istringstream iss(linha);
+            string quesito;
+            getline(iss, quesito, ',');
+
+            Ocorrencia ocorrencia;
+            string crianca;
+            while (getline(iss, crianca, ',')) {
+                string quantidade;
+                getline(iss, quantidade, ',');
+                ocorrencia.crianca = crianca;
+                ocorrencia.quantidade = stoi(quantidade);
+                ocorrencias[quesito].push_back(ocorrencia);
+            }
+        }
+
+        arquivo.close();
+    } else {
+        cout << "Erro ao abrir o arquivo indice.dat" << endl;
+    }
+}
 
 
 int main() {
@@ -178,11 +215,11 @@ int main() {
 	do {
 	    cout << "Menu:\n"
 	              << "1 - Ler novo arquivo CSV\n"
-	              << "2 - Gerar relatorio por criança\n"
+	              << "2 - Gerar relatorio por crian?a\n"
 	              << "3 - Gerar relatorio por quesito\n"
 	              << "4 - \n"
-	              << "5 - \n"
-	              << "6 - Atualizar dados\n"
+	              << "5 - Salvar dados\n"
+	              << "6 - Carregar dados\n"
 	              << "7 - Encerrar o programa\n"
 	              << "Digite a opcao: ";
 	    cin >> opcao;
@@ -219,17 +256,18 @@ int main() {
 			    break;
 	        }
 	        case 5: {
+	        	salvarDados(registros, ocorrencias);
 	            break;
 	        }
 	        case 6: {
-	        	atualizarDados(registros, ocorrencias);
+	        	carregarDados(registros, ocorrencias);
 	            break;
 	        }
 	        case 7:
 	            cout << "Encerrando o programa..." << endl;
 	            break;
 	        default:
-	            cout << "Opção inválida." << endl;
+	            cout << "Op??o inv?lida." << endl;
 	            break;
 	    }
 	
