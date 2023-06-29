@@ -18,7 +18,7 @@ struct Ocorrencia {
     int quantidade;
 };
 
-bool isNumber(const string& s)
+bool isNumber(const string& s) //Funcao para verificar se uma string e um numero inteiro positivo
 {
     for (char const &ch : s) {
         if (std::isdigit(ch) == 0) 
@@ -34,7 +34,7 @@ void lerArquivoCSV(const string& nomeArquivo, unordered_map<string, vector<Regis
     unordered_set<string> criancas;
     int numeroLinha = 0,tamanhoVet=0;
 
-    if (!arquivo.is_open()) {
+    if (!arquivo.is_open()) { //Verifica  se foi possivel abrir o arquivo
         log << "Erro: O arquivo " << nomeArquivo << " não pode ser aberto." << endl;
         log.close();
         cout << "Erro: O arquivo " << nomeArquivo <<  " do lote de arquivos não pôde ser aberto." << endl;
@@ -48,7 +48,7 @@ void lerArquivoCSV(const string& nomeArquivo, unordered_map<string, vector<Regis
         string entrada,execucoes;
         numeroLinha++;
         if (!nome.empty()) { //verifica se o nome nao esta vazio, evita de armazenar linhas vazias ou invalidas
-            if (criancas.count(nome) > 0) {
+            if (criancas.count(nome) > 0) {// verifica se existe nome duplicado no arquivo
                 log << "Erro no arquivo " << nomeArquivo << ", linha " << numeroLinha << ": Criança duplicada." << endl;
                 log.close();
                 arquivo.close();
@@ -61,9 +61,9 @@ void lerArquivoCSV(const string& nomeArquivo, unordered_map<string, vector<Regis
             while (getline(iss, entrada, ',')) {//como feito em nome,  agora armazeno as entradas
                 if(!entrada.empty()){//verifica se nao esta vazio
                     tamanhoVet = registro.entradas.size();
-                    if(tamanhoVet == 0 && !isNumber(entrada)){
-                        registro.entradas.push_back(entrada);//armazena no vetor
-                    }else if(!isNumber(entrada) && !isNumber(registro.entradas[tamanhoVet-1])){
+                    if(tamanhoVet == 0 && !isNumber(entrada)){// Se a entrada for a primeira e nao for um numero armazena no vetor
+                        registro.entradas.push_back(entrada);
+                    }else if(!isNumber(entrada) && !isNumber(registro.entradas[tamanhoVet-1])){ // se a entrada nao for um numero e a entrada anterior tambem nao for um numero imprime erro
                         log << "Erro no arquivo " << nomeArquivo << ", linha " << numeroLinha << ": Entrada invalida." << endl;
                         log.close();
                         arquivo.close();
@@ -105,7 +105,7 @@ void lerArquivoCSV(const string& nomeArquivo, unordered_map<string, vector<Regis
     /* foram criandos 2 mapas um de registro para funcao gerarRelatorioPorCrianca e outro de ocorrencias para funcao gerarRelatorioPorQuesito */
 }
 
-void lerCSVEmLote2(const string& nomeArquivo,unordered_map<string, vector<Registro>>& registros, unordered_map<string, vector<Ocorrencia>>& ocorrencias){
+void lerCSVEmLote(const string& nomeArquivo,unordered_map<string, vector<Registro>>& registros, unordered_map<string, vector<Ocorrencia>>& ocorrencias){
     ifstream arquivo(nomeArquivo+".txt");
     string linha;
     int numeroLinha = 0;
@@ -122,51 +122,6 @@ void lerCSVEmLote2(const string& nomeArquivo,unordered_map<string, vector<Regist
     }
     cout << "Operacao finalizada com sucesso." << endl;
 }
-
-/*void lerCSVEmLote(const string& nomeArquivo, unordered_map<string, vector<Registro>>& registros, unordered_map<string, vector<Ocorrencia>>& ocorrencias) {
-    ifstream arquivo(nomeArquivo);
-    string linha;
-    int numeroLinha = 0;
-
-    ofstream log("log.txt", ios::app); // Abre o arquivo de log em modo de anexação
-
-    if (!arquivo.is_open()) {
-        log << "Erro: O arquivo " << nomeArquivo << " não pode ser aberto." << endl;
-        log.close();
-        throw runtime_error("Erro fatal: O arquivo de entrada não pôde ser aberto.");
-    }
-
-    try {
-        unordered_set<string> criancas; // Conjunto para verificar duplicatas de crianças
-
-        while (getline(arquivo, linha)) {
-            ++numeroLinha;
-            try {
-                string nomeCrianca = extrairNomeCrianca(linha);
-                if (criancas.count(nomeCrianca) > 0) {
-                    log << "Erro no arquivo " << nomeArquivo << ", linha " << numeroLinha << ": Criança duplicada." << endl;
-                    log.close();
-                    arquivo.close();
-                    throw runtime_error("Erro fatal: Criança duplicada.");
-                }
-                criancas.insert(nomeCrianca);
-                lerArquivoCSV(linha, registros, ocorrencias);
-            } catch (const exception& e) {
-                log << "Erro no arquivo " << nomeArquivo << ", linha " << numeroLinha << ": " << e.what() << endl;
-                log.close();
-                arquivo.close();
-                throw runtime_error("Erro fatal: Ocorreu um problema durante a leitura do arquivo CSV.");
-            }
-        }
-    } catch (...) {
-        log.close();
-        arquivo.close();
-        throw; //Lança a exceção original para preservar o fluxo de exceção
-    }
-
-    log.close();
-    arquivo.close();
-}*/
 
 
 void gerarRelatorioPorCrianca(const string& nomeCrianca, const unordered_map<string, vector<Registro>>& registros) {
@@ -357,7 +312,7 @@ int main() {
                 string nomeArquivo;
 	            cout << "Digite o nome do arquivo txt (sem a extensao): ";
 	            cin >> nomeArquivo;
-	            lerCSVEmLote2(nomeArquivo, registros, ocorrencias);
+	            lerCSVEmLote(nomeArquivo, registros, ocorrencias);
 	            break;
 	        }
 	        case 5: {
