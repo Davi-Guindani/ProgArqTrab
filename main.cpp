@@ -3,12 +3,13 @@
 #include <sstream>
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
 
 using namespace std;
 
 struct Registro {
    string data;
-    vector<string> entradas;
+   vector<string> entradas;
 };
 
 struct Ocorrencia {
@@ -17,35 +18,72 @@ struct Ocorrencia {
     int quantidade;
 };
 
+bool isNumber(const string& s)
+{
+    for (char const &ch : s) {
+        if (std::isdigit(ch) == 0) 
+            return false;
+    }
+    return true;
+}
+
 void lerArquivoCSV(const string& nomeArquivo, unordered_map<string, vector<Registro>>& registros, unordered_map<string, vector<Ocorrencia>>& ocorrencias) {
+    ofstream log("log.txt", ios::app); // Abre o arquivo de log em modo de anexação
     ifstream arquivo(nomeArquivo + ".csv"); //abre o arquivo 
     string linha; // usado para armazenar cada linha do arquivo
+    unordered_set<string> criancas;
+    int numeroLinha = 0,tamanhoVet=0;
 
-    while (getline(arquivo, linha)) { //usado para percorrer todas as linhas do arquivo
+    if (!arquivo.is_open()) {
+        log << "Erro: O arquivo " << nomeArquivo << " não pode ser aberto." << endl;
+        log.close();
+        cout << "Erro: O arquivo " << nomeArquivo <<  " do lote de arquivos não pôde ser aberto." << endl;
+
+    }else{
+
+        while (getline(arquivo, linha)) { //usado para percorrer todas as linhas do arquivo
         istringstream iss(linha); //istringstream permite ler os dados como um fluxo de entrada
         string nome;
         getline(iss, nome, ',');//armazena o nome, como todas as criancas comecam com o nome e logo depois tem uma virgula, ele armazena tudo ate a primeira virgula na variavel nome
-        string entrada;
-
+        string entrada,execucoes;
+        numeroLinha++;
         if (!nome.empty()) { //verifica se o nome nao esta vazio, evita de armazenar linhas vazias ou invalidas
-            Registro registro;
-            registro.entradas.reserve(6); // N?mero m?ximo de entradas 
-
-            while (getline(iss, entrada, ',')) { //como feito em nome,  agora armazeno as entradas
-                if (!entrada.empty()) //verifica se nao esta vazio
-                    registro.entradas.push_back(entrada); //armazena no vetor
+            if (criancas.count(nome) > 0) {
+                log << "Erro no arquivo " << nomeArquivo << ", linha " << numeroLinha << ": Criança duplicada." << endl;
+                log.close();
+                arquivo.close();
+                cout << "Erro: Criança duplicada. A leitura do arquivo " << nomeArquivo << " foi cancelada na linha " << numeroLinha << ". Os dados anteriores a essa linha estão disponiveis no registro." << endl;
+                return;
             }
-
+            criancas.insert(nome);
+            Registro registro;
+            registro.entradas.reserve(6); // Numero maximo de entradas 
+            while (getline(iss, entrada, ',')) {//como feito em nome,  agora armazeno as entradas
+                if(!entrada.empty()){//verifica se nao esta vazio
+                    tamanhoVet = registro.entradas.size();
+                    if(tamanhoVet == 0 && !isNumber(entrada)){
+                        registro.entradas.push_back(entrada);//armazena no vetor
+                    }else if(!isNumber(entrada) && !isNumber(registro.entradas[tamanhoVet-1])){
+                        log << "Erro no arquivo " << nomeArquivo << ", linha " << numeroLinha << ": Entrada invalida." << endl;
+                        log.close();
+                        arquivo.close();
+                        cout << "Erro: Entrada invalida. A leitura do arquivo " << nomeArquivo << " foi cancelada na linha " << numeroLinha << endl;
+                        return;
+                    }else{
+                        registro.entradas.push_back(entrada);
+                    }
+                }                     
+            }
             string data = nomeArquivo.substr(0, nomeArquivo.find_first_of('.')); //armazena o nome do arquivo ate o ponto, eliminando a extensao
             registro.data = data; // extrai a data do nome do arquivo e atribui ao registro
 
-            registros[nome].push_back(registro); //adiciona 'registro' ao mapa 'registros', usa o nome como chave agrupando todos os registros de uma mesma crian?a
+            registros[nome].push_back(registro); //adiciona 'registro' ao mapa 'registros', usa o nome como chave agrupando todos os registros de uma mesma crianca
         }
     }
 
     arquivo.close(); // fecha o arquivo
 
-    for (auto& it : registros) { // percorre o mapa, cada iteracao obtem um par chave-valor, chave ? o nome da crianca e valor o vetor de registros associados a ela
+    for (auto& it : registros) { // percorre o mapa, cada iteracao obtem um par chave-valor, chave eh o nome da crianca e valor o vetor de registros associados a ela
         const string& crianca = it.first; //armazena o nome da crianca
         vector<Registro>& registrosCrianca = it.second; //referencia para o vetor de registros
 
@@ -62,16 +100,80 @@ void lerArquivoCSV(const string& nomeArquivo, unordered_map<string, vector<Regis
                 ocorrencias[quesito].push_back(ocorrencia);
             }
         }
+    }   
     }
     /* foram criandos 2 mapas um de registro para funcao gerarRelatorioPorCrianca e outro de ocorrencias para funcao gerarRelatorioPorQuesito */
 }
 
+void lerCSVEmLote2(const string& nomeArquivo,unordered_map<string, vector<Registro>>& registros, unordered_map<string, vector<Ocorrencia>>& ocorrencias){
+    ifstream arquivo(nomeArquivo+".txt");
+    string linha;
+    int numeroLinha = 0;
+
+    ofstream log("log.txt", ios::app); // Abre o arquivo de log em modo de anexação
+    if (!arquivo.is_open()) {
+        log << "Erro: O arquivo " << nomeArquivo << " não pode ser aberto." << endl;
+        log.close();
+        cout << "Erro: O arquivo de entrada não pôde ser aberto." << endl;
+        return;
+    }
+    while(getline(arquivo, linha)){
+        lerArquivoCSV(linha,registros,ocorrencias);
+    }
+    cout << "Operacao finalizada com sucesso." << endl;
+}
+
+/*void lerCSVEmLote(const string& nomeArquivo, unordered_map<string, vector<Registro>>& registros, unordered_map<string, vector<Ocorrencia>>& ocorrencias) {
+    ifstream arquivo(nomeArquivo);
+    string linha;
+    int numeroLinha = 0;
+
+    ofstream log("log.txt", ios::app); // Abre o arquivo de log em modo de anexação
+
+    if (!arquivo.is_open()) {
+        log << "Erro: O arquivo " << nomeArquivo << " não pode ser aberto." << endl;
+        log.close();
+        throw runtime_error("Erro fatal: O arquivo de entrada não pôde ser aberto.");
+    }
+
+    try {
+        unordered_set<string> criancas; // Conjunto para verificar duplicatas de crianças
+
+        while (getline(arquivo, linha)) {
+            ++numeroLinha;
+            try {
+                string nomeCrianca = extrairNomeCrianca(linha);
+                if (criancas.count(nomeCrianca) > 0) {
+                    log << "Erro no arquivo " << nomeArquivo << ", linha " << numeroLinha << ": Criança duplicada." << endl;
+                    log.close();
+                    arquivo.close();
+                    throw runtime_error("Erro fatal: Criança duplicada.");
+                }
+                criancas.insert(nomeCrianca);
+                lerArquivoCSV(linha, registros, ocorrencias);
+            } catch (const exception& e) {
+                log << "Erro no arquivo " << nomeArquivo << ", linha " << numeroLinha << ": " << e.what() << endl;
+                log.close();
+                arquivo.close();
+                throw runtime_error("Erro fatal: Ocorreu um problema durante a leitura do arquivo CSV.");
+            }
+        }
+    } catch (...) {
+        log.close();
+        arquivo.close();
+        throw; //Lança a exceção original para preservar o fluxo de exceção
+    }
+
+    log.close();
+    arquivo.close();
+}*/
+
 
 void gerarRelatorioPorCrianca(const string& nomeCrianca, const unordered_map<string, vector<Registro>>& registros) {
-    auto it = registros.find(nomeCrianca); //usa o iterador para procurar em "registros" usando o nome da crian?a como chave
+    auto it = registros.find(nomeCrianca); //usa o iterador para procurar em "registros" usando o nome da crianca como chave
 
-    if (it != registros.end()) { //se encontrar o nome da crian?a
-        const vector<Registro>& registrosCrianca = it->second; // aponta pros registros da crian?a em questao
+    if (it != registros.end()) { //se encontrar o nome da crianca
+        const vector<Registro>& registrosCrianca = it->second; // aponta pros registros da crianca em questao
 
         for (const Registro& registro : registrosCrianca) {
              if (!registro.data.empty()) {
@@ -82,13 +184,13 @@ void gerarRelatorioPorCrianca(const string& nomeCrianca, const unordered_map<str
                 string quesito = registro.entradas[i]; 
                 int quantidade = stoi(registro.entradas[i + 1]); // transforma o valor das entradas em inteiro "string to integer"
 
-               cout << quesito << ": " << quantidade << endl; // imprime cada quesito da crian?a em questao
+               cout << quesito << ": " << quantidade << endl; // imprime cada quesito da crianca em questao
             }
 
             cout << endl;
         }
     } else {
-        cout << "Crianca n?o encontrada." << endl; //caso nao entre no IF imprime isso ai
+        cout << "Crianca nao encontrada." << endl; //caso nao entre no IF imprime isso ai
     }
 }
 
@@ -213,11 +315,12 @@ int main() {
 	
 	int opcao;
 	do {
+        opcao = 0;
 	    cout << "Menu:\n"
 	              << "1 - Ler novo arquivo CSV\n"
-	              << "2 - Gerar relatorio por crian?a\n"
+	              << "2 - Gerar relatorio por crianca\n"
 	              << "3 - Gerar relatorio por quesito\n"
-	              << "4 - \n"
+	              << "4 - Processar arquivos CSV em lote\n"
 	              << "5 - Salvar dados\n"
 	              << "6 - Carregar dados\n"
 	              << "7 - Encerrar o programa\n"
@@ -229,9 +332,7 @@ int main() {
 	            string nomeArquivo;
 	            cout << "Digite o nome do arquivo (sem a extensao): ";
 	            cin >> nomeArquivo;
-	        	
 	            lerArquivoCSV(nomeArquivo, registros, ocorrencias);
-	            cout << "Arquivo lido e processado com sucesso." << endl;
 	            break;
 	        }
 	        case 2: {
@@ -253,7 +354,11 @@ int main() {
 	            break;
 	        }
 	        case 4: {
-			    break;
+                string nomeArquivo;
+	            cout << "Digite o nome do arquivo txt (sem a extensao): ";
+	            cin >> nomeArquivo;
+	            lerCSVEmLote2(nomeArquivo, registros, ocorrencias);
+	            break;
 	        }
 	        case 5: {
 	        	salvarDados(registros, ocorrencias);
@@ -267,7 +372,7 @@ int main() {
 	            cout << "Encerrando o programa..." << endl;
 	            break;
 	        default:
-	            cout << "Op??o inv?lida." << endl;
+	            cout << "Opcao invalida." << endl;
 	            break;
 	    }
 	
